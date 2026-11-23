@@ -1,0 +1,39 @@
+.git
+.github
+.idea
+.vscode
+node_modules
+vendor
+tests
+.phpunit.cache
+.phpunit.result.cache
+
+# Secrets and local settings never go into the image; production values come from .env at runtime.
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Local data and generated files.
+storage/app/private/*
+storage/app/public/*
+storage/logs/*
+storage/fonts
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/framework/testing/*
+!**/.gitignore
+bootstrap/cache/*.php
+public/storage
+public/css/filament
+public/js/filament
+public/fonts/filament
+
+# Real catalog exports and editor lock files.
+partidas_*.csv
+.~lock.*
+
+# Local development database.
+docker-compose.yml
+docker/mariadb

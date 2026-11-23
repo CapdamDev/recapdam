@@ -32,3 +32,4 @@ Thumbs.db
 # Real catalog exports (internal CAPDAM data; the repo is public). Import them from the app instead.
 /partidas_*.csv
 .~lock.*#
+/storage/fonts

@@ -34,6 +34,13 @@ php artisan test                                   # full suite
 php artisan test --filter=test_staff_can_create_a_resguardo   # single test
 ```
 
+**Production runs in Docker**; follow `DEPLOY.md`.
+- **Files.** The production pieces are `Dockerfile` (php:8.5-apache serving `public/`), `docker-compose.prod.yml` (project `recapdam-prod`: `app` plus its own `db` MariaDB), `docker/app/` (Apache vhost, php.ini, entrypoint) and `.env.production.example`. `docker-compose.yml` is the local development database only.
+- **Server constraints.** The production server also hosts other CAPDAM apps (turnos) on the host's Apache (mod_php 8.3) and MySQL 8.0. Never tell anyone to install or replace host packages (PHP, MySQL/MariaDB, Apache confs) for recapdam: an `apt install mariadb-server` once replaced the host's MySQL and took turnos down. The `app` container binds only to `127.0.0.1:${APP_PORT:-8090}`, `db` publishes no port, and the host's Apache only proxies the recapdam domain.
+- **Startup.** The entrypoint waits for the DB and runs `migrate --force`, `optimize` and `filament:optimize` on every start. Only `storage/app` is persisted (volume `recapdam-prod_storage`); `storage/fonts` (dompdf's font cache) and compiled views are rebuilt per container.
+- **Proxy.** `bootstrap/app.php` trusts private-network proxies (`TRUSTED_PROXIES`), so `X-Forwarded-Proto` from the host's Apache makes Laravel and Livewire generate `https://` URLs.
+- **First admin.** `php artisan usuarios:hacer-admin <email>` promotes the first user created with `make:filament-user`.
+
 Tests run against the `recapdam_test` database (set in `phpunit.xml`), which `docker/mariadb/01-test-database.sh` creates only when the MariaDB volume is first initialized. If it's missing, recreate the volume with `docker compose down -v && docker compose up -d --wait`, which wipes local data. SQLite is not used.
 
 ## Architecture

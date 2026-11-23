@@ -40,6 +40,10 @@ class ResguardoPdf
         $options->setDefaultFont('DejaVu Sans'); // covers accents and ñ
         $options->setIsRemoteEnabled(false);
         $options->setChroot(base_path());
+        // vendor/ isn't writable by the web server in the Docker image, so keep dompdf's font cache in storage.
+        $fuentes = storage_path('fonts');
+        is_dir($fuentes) || mkdir($fuentes, 0775, true);
+        $options->setFontCache($fuentes);
 
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html, 'UTF-8');

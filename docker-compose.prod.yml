@@ -1,0 +1,44 @@
+# Production stack: the app (PHP + Apache) and its own MariaDB. See DEPLOY.md.
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Nothing listens publicly: the app is bound to 127.0.0.1:${APP_PORT} for the host's Apache reverse proxy,
+# and the database has no published port at all (it can't clash with a MySQL already on the host).
+name: recapdam-prod
+
+services:
+  app:
+    build: .
+    image: recapdam-app:latest
+    restart: unless-stopped
+    env_file: ${ENV_FILE:-.env}
+    environment:
+      DB_CONNECTION: mariadb
+      DB_HOST: db
+      DB_PORT: "3306"
+    ports:
+      - "127.0.0.1:${APP_PORT:-8090}:80"
+    volumes:
+      - storage:/var/www/html/storage/app # uploaded evidencias, logo, favicon
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USERNAME}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      retries: 30
+
+volumes:
+  storage:
+  db:
