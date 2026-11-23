@@ -21,7 +21,12 @@ Laravel 13 (PHP 8.5) with MariaDB, and Filament 5 for the entire staff UI at `/a
 ```sh
 docker compose up -d --wait       # MariaDB on 127.0.0.1:3306, credentials read from .env
 php artisan migrate
+php artisan storage:link          # once: serves logo/favicon from storage/app/public
 php artisan serve                 # http://localhost:8000/admin
+# This machine's php.ini has opcache.revalidate_freq=180, so the dev server keeps serving old code
+# for up to 3 minutes after an edit. `php -d ... artisan serve` does NOT help (the server is a child
+# process without the -d flag). Either restart the server, or run the built-in server directly:
+#   cd public && php -d opcache.revalidate_freq=0 -S 127.0.0.1:8000 ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php
 php artisan make:filament-user    # create a staff login (interactive)
 
 php artisan test                                   # full suite
@@ -42,6 +47,13 @@ Tests run against the `recapdam_test` database (set in `phpunit.xml`), which `do
 - **Printable format.** `App\Support\ResguardoPdf` renders `resources/views/pdf/resguardo.blade.php` with dompdf (used directly, since there's no Laravel 13 wrapper; it needs PHP's `iconv`). The template copies the official CAPDAM "Resguardo de Vehículos" layout and switches to "Resguardo de Bienes" for other categories. The logo is read from `public/img/logo-capdam.png` when present.
 - `registrado_por` and `subido_por` are set automatically from the logged-in user in `creating` model events.
 - Filament resources live in `app/Filament/Resources/<Plural>/` with separate `Schemas/` and `Tables/` classes. Evidencias are managed only through `EvidenciasRelationManager` on the resguardo view page. Personas and equipos show a read-only resguardo history.
+- **Branding (Configuración → Ajustes, admin only).** The system name, logo, favicon and color palette are stored in the single-row `ajustes` table and read through `Ajuste::actual()`.
+  - `AdminPanelProvider` passes closures to `brandName`/`brandLogo`/`favicon`/`colors`, so changes apply on the next request.
+  - `App\Support\Paleta` builds Filament's primary palette and pins shade 600, which Filament uses for buttons, to the exact principal color.
+  - Acento and texto are applied by the `resources/views/filament/ajustes-estilos.blade.php` render hook.
+  - Logo and favicon live on the `public` disk, which needs `php artisan storage:link` on each deploy.
+  - `Ajuste::actual()` caches a plain attributes array, never the model: `cache.serializable_classes` is `false`, so a cached object comes back as `__PHP_Incomplete_Class`. The array cache used in tests doesn't catch this. `test_settings_survive_the_database_cache` does.
+  - Filament registers panel colors once per process. In a test, check rendered colors with an HTTP request that is not preceded by `Livewire::test()` in the same test.
 - **Roles** (`App\Enums\RolUsuario` in `users.rol`):
   - **Root Admin** can do everything.
   - **Patrimonio** creates and edits personas, equipos, resguardos and evidencias, marks signatures and downloads PDFs. It can't delete records, unmark signatures, or open Configuración (Usuarios, Firmantes).

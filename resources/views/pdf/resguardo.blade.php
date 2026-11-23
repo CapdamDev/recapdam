@@ -148,7 +148,7 @@
 <div class="footer">
     <table>
         <tr>
-            <td>recapdam — Control Patrimonial</td>
+            <td>{{ $nombreSistema ?? 'recapdam' }} — Control Patrimonial</td>
             <td style="text-align: right;">Fecha: {{ $generado->format('d/m/Y h:i:s a') }}</td>
         </tr>
     </table>

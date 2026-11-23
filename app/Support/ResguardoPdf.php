@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Enums\RolFirma;
+use App\Models\Ajuste;
 use App\Models\Resguardo;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -13,8 +14,6 @@ use Illuminate\Support\Str;
  */
 class ResguardoPdf
 {
-    public const LOGO_PATH = 'img/logo-capdam.png';
-
     public static function generar(Resguardo $resguardo): string
     {
         $resguardo->loadMissing(['persona', 'equipo', 'firmas']);
@@ -24,14 +23,16 @@ class ResguardoPdf
             ->sortBy(fn ($firma) => array_search($firma->rol, $orden, true))
             ->keyBy(fn ($firma) => $firma->rol->value);
 
-        $logo = public_path(self::LOGO_PATH);
+        $ajuste = Ajuste::actual();
+        $logo = $ajuste->logoPath();
 
         $html = view('pdf.resguardo', [
             'resguardo' => $resguardo,
             'equipo' => $resguardo->equipo,
             'esVehiculo' => $resguardo->equipo->esVehiculo(),
             'firmas' => $firmas,
-            'logo' => is_file($logo) ? 'data:image/png;base64,'.base64_encode(file_get_contents($logo)) : null,
+            'logo' => $logo ? 'data:'.mime_content_type($logo).';base64,'.base64_encode(file_get_contents($logo)) : null,
+            'nombreSistema' => $ajuste->nombre_sistema,
             'generado' => now(),
         ])->render();
 
