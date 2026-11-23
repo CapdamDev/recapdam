@@ -17,7 +17,7 @@ class ResguardosTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->with(['persona', 'equipo', 'firmas']))
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['persona', 'equipo.partida', 'firmas']))
             ->columns([
                 TextColumn::make('persona.nombre')
                     ->label('Persona')
@@ -27,7 +27,8 @@ class ResguardosTable
                     ->label('Número de serie')
                     ->searchable()
                     ->copyable(),
-                TextColumn::make('equipo.categoria')
+                TextColumn::make('equipo.partida.descripcion')
+                    ->placeholder(fn (Resguardo $record) => $record->equipo->categoria)
                     ->label('Equipo')
                     ->description(fn (Resguardo $record) => trim("{$record->equipo->marca} {$record->equipo->modelo}")),
                 TextColumn::make('fecha_asignacion')

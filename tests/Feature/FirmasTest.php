@@ -12,6 +12,7 @@ use App\Filament\Resources\Resguardos\RelationManagers\FirmasRelationManager;
 use App\Models\Equipo;
 use App\Models\Firma;
 use App\Models\Firmante;
+use App\Models\Partida;
 use App\Models\Persona;
 use App\Models\Resguardo;
 use App\Models\User;
@@ -129,7 +130,7 @@ class FirmasTest extends TestCase
     {
         Livewire::test(CreateEquipo::class)
             ->fillForm([
-                'categoria' => Equipo::CATEGORIA_VEHICULO,
+                'partida_id' => Partida::factory()->vehiculo()->create()->id,
                 'numero_serie' => '3N6AD35A3PK851186',
                 'numero_inventario' => '00199',
                 'placa' => 'FH2048A',

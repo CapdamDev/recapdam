@@ -24,7 +24,9 @@ class ResguardoInfolist
                 Section::make('Equipo')
                     ->schema([
                         TextEntry::make('equipo.numero_serie')->label('Número de serie')->copyable(),
-                        TextEntry::make('equipo.categoria')->label('Categoría'),
+                        TextEntry::make('equipo.partida.descripcion')->label('Producto')
+                            ->placeholder(fn (Resguardo $record) => $record->equipo->categoria)
+                            ->helperText(fn (Resguardo $record) => $record->equipo->partida?->codigo),
                         TextEntry::make('equipo.numero_inventario')->label('No. inventario')->placeholder('—'),
                         TextEntry::make('equipo.placa')->label('Placa')->placeholder('—')
                             ->visible(fn (Resguardo $record) => $record->equipo->esVehiculo()),

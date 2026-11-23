@@ -92,8 +92,8 @@
     </table>
 @else
     <table class="grid">
-        <tr class="h"><td style="width: 22%">Categoría</td><td style="width: 22%">Marca</td><td style="width: 22%">Modelo</td><td>No. de Serie</td></tr>
-        <tr class="val"><td>{{ $v($equipo->categoria) }}</td><td>{{ $v($equipo->marca) }}</td><td>{{ $v($equipo->modelo) }}</td><td>{{ $v($equipo->numero_serie) }}</td></tr>
+        <tr class="h"><td style="width: 22%">Producto</td><td style="width: 22%">Marca</td><td style="width: 22%">Modelo</td><td>No. de Serie</td></tr>
+        <tr class="val"><td>{{ $v($equipo->partida->descripcion ?? $equipo->categoria) }}</td><td>{{ $v($equipo->marca) }}</td><td>{{ $v($equipo->modelo) }}</td><td>{{ $v($equipo->numero_serie) }}</td></tr>
         <tr class="h"><td>Clase</td><td>Tipo</td><td>Edo. de Conservación</td><td>Descripción</td></tr>
         <tr class="val"><td>{{ $v($equipo->clase) }}</td><td>{{ $v($equipo->subtipo) }}</td><td>{{ $v($equipo->estado_conservacion) }}</td><td>{{ $v($equipo->descripcion) }}</td></tr>
         <tr class="h"><td>Factura</td><td>Fecha de Adquisición</td><td>Proveedor</td><td>Importe</td></tr>

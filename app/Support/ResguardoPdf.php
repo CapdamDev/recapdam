@@ -16,7 +16,7 @@ class ResguardoPdf
 {
     public static function generar(Resguardo $resguardo): string
     {
-        $resguardo->loadMissing(['persona', 'equipo', 'firmas']);
+        $resguardo->loadMissing(['persona', 'equipo.partida', 'firmas']);
 
         $orden = RolFirma::cases();
         $firmas = $resguardo->firmas

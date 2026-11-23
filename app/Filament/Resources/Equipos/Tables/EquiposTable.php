@@ -16,7 +16,7 @@ class EquiposTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->with('resguardoActivo.persona'))
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['resguardoActivo.persona', 'partida']))
             ->columns([
                 TextColumn::make('numero_serie')
                     ->label('Número de serie')
@@ -27,9 +27,16 @@ class EquiposTable
                     ->label('No. inventario')
                     ->searchable()
                     ->placeholder('—'),
+                TextColumn::make('partida.descripcion')
+                    ->label('Producto')
+                    ->description(fn (Equipo $record) => $record->partida?->codigo)
+                    ->placeholder(fn (Equipo $record) => $record->categoria)
+                    ->searchable()
+                    ->wrap(),
                 TextColumn::make('categoria')
-                    ->label('Categoría')
-                    ->sortable(),
+                    ->label('Grupo')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('placa')
                     ->searchable()
                     ->placeholder('—')
@@ -47,8 +54,8 @@ class EquiposTable
             ->defaultSort('numero_serie')
             ->filters([
                 SelectFilter::make('categoria')
-                    ->label('Categoría')
-                    ->options(array_combine(Equipo::CATEGORIAS, Equipo::CATEGORIAS)),
+                    ->label('Grupo')
+                    ->options(fn () => Equipo::query()->whereNotNull('categoria')->distinct()->orderBy('categoria')->pluck('categoria', 'categoria')->all()),
                 TernaryFilter::make('asignado')
                     ->queries(
                         true: fn (Builder $query) => $query->whereHas('resguardos', fn ($q) => $q->whereNull('fecha_devolucion')),

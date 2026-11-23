@@ -18,7 +18,7 @@ class EquipoFactory extends Factory
     public function definition(): array
     {
         return [
-            'categoria' => fake()->randomElement(['Laptop', 'PC', 'Monitor', 'Celular', 'Impresora']),
+            'partida_id' => \App\Models\Partida::factory(),
             'numero_inventario' => fake()->unique()->numerify('#####'),
             'marca' => fake()->randomElement(['Dell', 'HP', 'Lenovo', 'Apple', 'Samsung']),
             'modelo' => fake()->bothify('??-####'),
@@ -29,7 +29,7 @@ class EquipoFactory extends Factory
     public function vehiculo(): static
     {
         return $this->state(fn () => [
-            'categoria' => \App\Models\Equipo::CATEGORIA_VEHICULO,
+            'partida_id' => \App\Models\Partida::factory()->vehiculo(),
             'marca' => 'NISSAN',
             'modelo' => 'ESTACA NP300',
             'anio' => 2023,

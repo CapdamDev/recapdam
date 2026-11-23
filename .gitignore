@@ -28,3 +28,7 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Real catalog exports (internal CAPDAM data; the repo is public). Import them from the app instead.
+/partidas_*.csv
+.~lock.*#
