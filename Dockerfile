@@ -8,7 +8,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # intl: Filament · pdo_mysql: MariaDB · gd: image previews · zip/bcmath: Laravel · opcache: speed.
 # iconv, mbstring, xml, curl and fileinfo are built into the base image.
 RUN install-php-extensions intl pdo_mysql gd zip bcmath opcache \
-    && a2enmod rewrite headers remoteip \
+    && a2enmod rewrite headers \
     && rm -rf /var/lib/apt/lists/*
 
 COPY docker/app/php.ini "$PHP_INI_DIR/conf.d/zz-recapdam.ini"
